@@ -1,0 +1,18 @@
+use_default_settings: true
+
+general:
+  instance_name: "OpenAgentSearch Local"
+
+search:
+  formats:
+    - html
+    - json
+
+server:
+  secret_key: "openagentsearch-dev-secret-key-change-in-production"
+  limiter: false
+  image_proxy: false
+
+redis:
+  url: redis://redis:6379/0
+
