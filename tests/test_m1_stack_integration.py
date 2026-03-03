@@ -10,6 +10,7 @@ from urllib.request import urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 RUN_INTEGRATION = os.environ.get("OAS_RUN_DOCKER_TESTS") == "1"
+DEFAULT_SERVICES = ("redis", "searxng", "api")
 
 
 def _run_compose(*args: str) -> subprocess.CompletedProcess[str]:
@@ -18,6 +19,8 @@ def _run_compose(*args: str) -> subprocess.CompletedProcess[str]:
         cwd=ROOT,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=False,
     )
 
@@ -38,9 +41,20 @@ def _is_service_healthy(service: str) -> bool:
         cwd=ROOT,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=False,
     )
     return inspect.returncode == 0 and inspect.stdout.strip() == "healthy"
+
+
+def _wait_for_services_healthy(services: tuple[str, ...], timeout_seconds: int = 180) -> bool:
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        if all(_is_service_healthy(svc) for svc in services):
+            return True
+        time.sleep(3)
+    return False
 
 
 @unittest.skipIf(shutil.which("docker") is None, "docker is not installed")
@@ -57,21 +71,26 @@ class M1StackIntegrationTests(unittest.TestCase):
         _run_compose("down", "-v", "--remove-orphans")
 
     def test_default_services_become_healthy(self) -> None:
-        services = ("redis", "searxng", "api")
-        deadline = time.time() + 180
-        while time.time() < deadline:
-            if all(_is_service_healthy(svc) for svc in services):
-                return
-            time.sleep(3)
-        self.fail("services did not become healthy within timeout")
+        self.assertTrue(
+            _wait_for_services_healthy(DEFAULT_SERVICES),
+            "services did not become healthy within timeout",
+        )
 
     def test_api_health_endpoint(self) -> None:
+        self.assertTrue(
+            _wait_for_services_healthy(DEFAULT_SERVICES),
+            "services did not become healthy before API health check",
+        )
         with urlopen("http://127.0.0.1:8000/health", timeout=10) as response:
             self.assertEqual(response.status, 200)
             payload = json.loads(response.read().decode("utf-8"))
         self.assertEqual(payload.get("status"), "ok")
 
     def test_searxng_returns_json(self) -> None:
+        self.assertTrue(
+            _wait_for_services_healthy(DEFAULT_SERVICES),
+            "services did not become healthy before SearXNG query",
+        )
         with urlopen("http://127.0.0.1:8080/search?format=json&q=agent", timeout=20) as response:
             self.assertEqual(response.status, 200)
             payload = json.loads(response.read().decode("utf-8"))
@@ -81,4 +100,3 @@ class M1StackIntegrationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
