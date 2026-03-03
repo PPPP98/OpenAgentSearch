@@ -21,7 +21,11 @@ class M1LayoutTests(unittest.TestCase):
             ROOT / "docker-compose.yml",
             ROOT / "infra" / "searxng" / "settings.yml",
             ROOT / "apps" / "api" / "app" / "main.py",
+            ROOT / "apps" / "api" / "pyproject.toml",
+            ROOT / "apps" / "api" / "uv.lock",
             ROOT / "apps" / "mcp" / "app" / "main.py",
+            ROOT / "apps" / "mcp" / "pyproject.toml",
+            ROOT / "apps" / "mcp" / "uv.lock",
         ]
         for path in expected:
             self.assertTrue(path.is_file(), f"missing file: {path}")
@@ -34,4 +38,3 @@ class M1LayoutTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
