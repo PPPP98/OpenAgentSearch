@@ -21,6 +21,9 @@ Build a fully open, self-hosted agentic web search service with:
 - 2026-03-04: Implemented `/v1/extract` pipeline (SSRF validation, fetcher redirect validation, extraction + passage chunking + hash, Redis cache)
 - 2026-03-04: `uv run python -m unittest discover -s tests -v` passed (`OK`, 20 run, 3 skipped)
 - 2026-03-04: `OAS_RUN_DOCKER_TESTS=1 uv run python -m unittest tests.test_m1_stack_integration -v` passed (`OK`, 3 run)
+- 2026-03-04: Implemented `/v1/search` with `mode=speed`, `mode=balanced`, and Redis-backed query cache
+- 2026-03-04: `uv run python -m unittest discover -s tests -v` passed (`OK`, 23 run, 3 skipped)
+- 2026-03-04: API routes include `/v1/search` and `/v1/extract`
 
 ## Branch Strategy (Solo OSS)
 
@@ -79,13 +82,13 @@ Acceptance:
 - [ ] Live external URL E2E validation without mocks (environment-dependent)
 
 ### M4: /v1/search
-- [ ] Call SearXNG -> results
-- [ ] mode=speed (SERP only)
-- [ ] mode=balanced (fetch+extract top N)
-- [ ] Query cache
+- [x] Call SearXNG -> results
+- [x] mode=speed (SERP only)
+- [x] mode=balanced (fetch+extract top N)
+- [x] Query cache
 
 Acceptance:
-- [ ] Same query twice should hit cache and reduce outbound fetch count
+- [x] Same query twice hits query cache and avoids extra provider call (unit-tested)
 
 ### M5: MCP Server (thin wrapper)
 - [ ] Expose tools: openagentsearch.search, openagentsearch.extract
