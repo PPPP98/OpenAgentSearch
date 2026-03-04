@@ -29,6 +29,10 @@ Build a fully open, self-hosted agentic web search service with:
 - 2026-03-04: MCP tools implemented: `openagentsearch.search`, `openagentsearch.extract`
 - 2026-03-04: MCP auth header support implemented (env default + per-call override)
 - 2026-03-04: `uv run python -m unittest discover -s tests -v` passed (`OK`, 27 run, 3 skipped)
+- 2026-03-04: Implemented M6 hardening set (domain rate limiting, observability, domain policy config) in commit `b31fa2e`
+- 2026-03-04: `uv run python -m unittest discover -s tests -v` passed (`OK`, 38 run, 3 skipped)
+- 2026-03-04: `OAS_RUN_DOCKER_TESTS=1 uv run python -m unittest tests.test_m1_stack_integration -v` passed (`OK`, 3 run)
+- 2026-03-04: Repeated-query sample (`/v1/search`, same query x5) confirmed cache behavior (`miss=1`, `hit=4`) and latency drop after warm-up
 
 ## Branch Strategy (Solo OSS)
 
@@ -105,9 +109,9 @@ Acceptance:
 - [x] MCP client can call tools via `fastmcp` and get correct JSON payloads
 
 ### M6: Hardening
-- [ ] Per-domain rate limiting
-- [ ] Observability: logs + metrics (cache hit, fetch errors)
-- [ ] Config file: domain policies (render mode, ttl, allowlist)
+- [x] Per-domain rate limiting
+- [x] Observability: logs + metrics (cache hit, fetch errors)
+- [x] Config file: domain policies (render mode, ttl, allowlist)
 
 Acceptance:
-- [ ] Load test with repeated queries shows stable latency and high cache hit
+- [x] Load test with repeated queries shows stable latency and high cache hit
