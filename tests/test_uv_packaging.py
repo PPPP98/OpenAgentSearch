@@ -30,7 +30,9 @@ class UvPackagingTests(unittest.TestCase):
 
         data = self._read_toml(pyproject_path)
         self.assertEqual(data["project"]["name"], "openagentsearch-mcp")
-        self.assertEqual(data["project"]["dependencies"], [])
+        dependencies = set(data["project"]["dependencies"])
+        self.assertIn("fastmcp==3.1.0", dependencies)
+        self.assertIn("httpx==0.28.1", dependencies)
 
 
 if __name__ == "__main__":

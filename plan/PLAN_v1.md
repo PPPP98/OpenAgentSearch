@@ -24,6 +24,11 @@ Build a fully open, self-hosted agentic web search service with:
 - 2026-03-04: Implemented `/v1/search` with `mode=speed`, `mode=balanced`, and Redis-backed query cache
 - 2026-03-04: `uv run python -m unittest discover -s tests -v` passed (`OK`, 23 run, 3 skipped)
 - 2026-03-04: API routes include `/v1/search` and `/v1/extract`
+- 2026-03-04: Rolled back M5 custom MCP implementation and returned to pre-M5 baseline (`bd7d268`)
+- 2026-03-04: Implemented M5 using `fastmcp` thin wrapper (no custom JSON-RPC loop)
+- 2026-03-04: MCP tools implemented: `openagentsearch.search`, `openagentsearch.extract`
+- 2026-03-04: MCP auth header support implemented (env default + per-call override)
+- 2026-03-04: `uv run python -m unittest discover -s tests -v` passed (`OK`, 27 run, 3 skipped)
 
 ## Branch Strategy (Solo OSS)
 
@@ -91,12 +96,13 @@ Acceptance:
 - [x] Same query twice hits query cache and avoids extra provider call (unit-tested)
 
 ### M5: MCP Server (thin wrapper)
-- [ ] Expose tools: openagentsearch.search, openagentsearch.extract
-- [ ] Minimal tool schemas to reduce token use
-- [ ] Auth header support
+- [x] Implement MCP server using `fastmcp` (avoid custom JSON-RPC loop)
+- [x] Expose tools: openagentsearch.search, openagentsearch.extract
+- [x] Keep tool schemas/descriptions minimal to reduce token use
+- [x] Support auth header: env default + per-call override
 
 Acceptance:
-- [ ] MCP client can call tools and get correct JSON
+- [x] MCP client can call tools via `fastmcp` and get correct JSON payloads
 
 ### M6: Hardening
 - [ ] Per-domain rate limiting
