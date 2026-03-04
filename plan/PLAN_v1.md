@@ -18,6 +18,9 @@ Build a fully open, self-hosted agentic web search service with:
 - Latest failure to follow up: `test_api_health_endpoint` returned `http.client.RemoteDisconnected`
 - Integration retest after fix: `OAS_RUN_DOCKER_TESTS=1 uv run python -m unittest tests.test_m1_stack_integration -v` passed (`OK`, 3 run)
 - Added M2 core modules: schemas (`SearchRequest/SearchResult/ExtractRequest/ExtractResult`), `SearxngProvider`, URL normalizer + dedupe, and unit tests
+- 2026-03-04: Implemented `/v1/extract` pipeline (SSRF validation, fetcher redirect validation, extraction + passage chunking + hash, Redis cache)
+- 2026-03-04: `uv run python -m unittest discover -s tests -v` passed (`OK`, 20 run, 3 skipped)
+- 2026-03-04: `OAS_RUN_DOCKER_TESTS=1 uv run python -m unittest tests.test_m1_stack_integration -v` passed (`OK`, 3 run)
 
 ## Branch Strategy (Solo OSS)
 
@@ -66,13 +69,14 @@ Acceptance:
 - [x] Unit tests for URL canonicalization and dedupe
 
 ### M3: /v1/extract
-- [ ] SSRF protection middleware (scheme allowlist, private IP block, redirect validation)
-- [ ] HttpFetcher + Extractor (trafilatura first, readability fallback)
-- [ ] Passage chunking + hash
-- [ ] Redis cache: url->extract
+- [x] SSRF protection (scheme allowlist, private IP block, redirect validation)
+- [x] HttpFetcher + Extractor (trafilatura first, readability fallback)
+- [x] Passage chunking + hash
+- [x] Redis cache: url->extract
 
 Acceptance:
-- [ ] Given a known URL, returns markdown + passages within limits
+- [x] Given a known URL shape (`https://example.com`), extraction service returns markdown + passages within limits (unit-tested with fake fetcher)
+- [ ] Live external URL E2E validation without mocks (environment-dependent)
 
 ### M4: /v1/search
 - [ ] Call SearXNG -> results
