@@ -10,7 +10,7 @@ Korean documentation: [README.ko.md](README.ko.md)
 ## Quick Start (2 min)
 
 ```bash
-git clone <YOUR_REPO_URL>
+git clone https://github.com/PPPP98/OpenAgentSearch.git
 cd OpenAgentSearch
 docker compose up -d --build
 ```
@@ -67,7 +67,7 @@ This project uses `SearXNG` as a search provider, then adds the missing producti
 ### B. Clone
 
 ```bash
-git clone <YOUR_REPO_URL>
+git clone https://github.com/PPPP98/OpenAgentSearch.git
 cd OpenAgentSearch
 ```
 

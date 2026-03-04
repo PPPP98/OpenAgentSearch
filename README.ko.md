@@ -10,7 +10,7 @@
 ## 빠른 시작 (2분)
 
 ```bash
-git clone <YOUR_REPO_URL>
+git clone https://github.com/PPPP98/OpenAgentSearch.git
 cd OpenAgentSearch
 docker compose up -d --build
 ```
@@ -67,7 +67,7 @@ OpenAgentSearch는 에이전트용 검색 레이어를 직접 통제 가능하�
 ### B. 클론
 
 ```bash
-git clone <YOUR_REPO_URL>
+git clone https://github.com/PPPP98/OpenAgentSearch.git
 cd OpenAgentSearch
 ```
 
