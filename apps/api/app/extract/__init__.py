@@ -1,4 +1,7 @@
 __all__ = [
+    "DomainPolicyBlocked",
+    "DomainRateLimitExceeded",
+    "DomainTokenBucketLimiter",
     "ExtractService",
     "FetchResult",
     "HttpFetcher",
@@ -9,6 +12,18 @@ __all__ = [
 
 
 def __getattr__(name: str):
+    if name == "DomainPolicyBlocked":
+        from .policy import DomainPolicyBlocked
+
+        return DomainPolicyBlocked
+    if name == "DomainRateLimitExceeded":
+        from .rate_limit import DomainRateLimitExceeded
+
+        return DomainRateLimitExceeded
+    if name == "DomainTokenBucketLimiter":
+        from .rate_limit import DomainTokenBucketLimiter
+
+        return DomainTokenBucketLimiter
     if name == "ExtractService":
         from .service import ExtractService
 

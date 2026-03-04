@@ -42,15 +42,16 @@ class RedisExtractCache:
             content_hash=raw.get("content_hash"),
         )
 
-    async def set(self, result: ExtractResult) -> None:
+    async def set(self, result: ExtractResult, *, ttl_seconds: int | None = None) -> None:
         client = await self._get_client()
         if client is None:
             return
 
         key = self._build_key(result.url)
         payload = json.dumps(asdict(result), ensure_ascii=False)
+        ttl = self._ttl_seconds if ttl_seconds is None else ttl_seconds
         try:
-            await client.setex(key, self._ttl_seconds, payload)
+            await client.setex(key, ttl, payload)
         except Exception:
             return
 

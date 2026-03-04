@@ -1,0 +1,16 @@
+{
+  "default": {
+    "allow": true,
+    "ttl_sec": 600,
+    "render_mode": "auto"
+  },
+  "domains": {
+    "example.com": {
+      "allow": false
+    },
+    "*.docs.example.org": {
+      "ttl_sec": 120,
+      "render_mode": "http"
+    }
+  }
+}
