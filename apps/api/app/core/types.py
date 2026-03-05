@@ -1,4 +1,10 @@
 from dataclasses import dataclass, field
+import re
+
+
+_LANGUAGE_RE = re.compile(r"^[a-z]{2}(?:-[a-z]{2})?$")
+_VALID_TIME_RANGES = {"", "day", "month", "year"}
+_VALID_SAFESEARCH = {0, 1, 2}
 
 
 @dataclass(slots=True, frozen=True)
@@ -8,6 +14,9 @@ class SearchRequest:
     page: int = 1
     categories: tuple[str, ...] = field(default_factory=tuple)
     engines: tuple[str, ...] = field(default_factory=tuple)
+    language: str = "all"
+    time_range: str = ""
+    safesearch: int = 1
 
     def __post_init__(self) -> None:
         query = self.query.strip()
@@ -20,9 +29,21 @@ class SearchRequest:
 
         categories = tuple(cat.strip() for cat in self.categories if cat and cat.strip())
         engines = tuple(engine.strip() for engine in self.engines if engine and engine.strip())
+        language = self.language.strip().lower() if self.language else "all"
+        if language != "all" and not _LANGUAGE_RE.match(language):
+            raise ValueError("language must be 'all' or IETF-like code (e.g. 'en', 'ko-kr')")
+        time_range = self.time_range.strip().lower()
+        if time_range not in _VALID_TIME_RANGES:
+            raise ValueError("time_range must be one of: '', 'day', 'month', 'year'")
+        safesearch = int(self.safesearch)
+        if safesearch not in _VALID_SAFESEARCH:
+            raise ValueError("safesearch must be one of: 0, 1, 2")
         object.__setattr__(self, "query", query)
         object.__setattr__(self, "categories", categories)
         object.__setattr__(self, "engines", engines)
+        object.__setattr__(self, "language", language)
+        object.__setattr__(self, "time_range", time_range)
+        object.__setattr__(self, "safesearch", safesearch)
 
 
 @dataclass(slots=True, frozen=True)

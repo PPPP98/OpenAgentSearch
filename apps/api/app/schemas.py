@@ -24,6 +24,9 @@ class SearchRequestBody(BaseModel):
     page: int = Field(default=1, ge=1)
     categories: list[str] = Field(default_factory=list)
     engines: list[str] = Field(default_factory=list)
+    language: str = "all"
+    time_range: Literal["", "day", "month", "year"] = ""
+    safesearch: int = Field(default=1, ge=0, le=2)
     extract_top_n: int = Field(default=3, ge=0, le=20)
     max_extract_chars: int = Field(default=6_000, ge=1, le=200_000)
 
@@ -51,5 +54,8 @@ class SearchResponseBody(BaseModel):
     mode: Literal["speed", "balanced"]
     limit: int
     page: int
+    language: str = "all"
+    time_range: Literal["", "day", "month", "year"] = ""
+    safesearch: int = Field(default=1, ge=0, le=2)
     results: list[SearchResultBody]
     cached: bool

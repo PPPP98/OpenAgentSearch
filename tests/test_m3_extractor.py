@@ -37,6 +37,29 @@ class ExtractorTests(unittest.TestCase):
         for passage in passages:
             self.assertLessEqual(len(passage), 300)
 
+    def test_extract_document_fallback_reduces_common_noise(self) -> None:
+        html = """
+        <html>
+          <head><title>Article</title></head>
+          <body>
+            <nav>Home | Docs | Pricing</nav>
+            <div id="cookie-banner">Accept all cookies</div>
+            <article>
+              <h1>Main Story</h1>
+              <p>This is the main content paragraph with useful details.</p>
+              <p>Another important sentence for the article body.</p>
+            </article>
+            <footer>Privacy Policy | Terms</footer>
+          </body>
+        </html>
+        """
+        result = extract_document(html, max_chars=2000)
+
+        self.assertIn("Main Story", result.markdown)
+        self.assertIn("main content paragraph", result.markdown)
+        self.assertNotIn("Accept all cookies", result.markdown)
+        self.assertNotIn("Privacy Policy", result.markdown)
+
 
 if __name__ == "__main__":
     unittest.main()

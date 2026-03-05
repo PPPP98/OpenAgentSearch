@@ -1,0 +1,209 @@
+{
+  "schema_version": "search-compare.v1",
+  "generated_at": "2026-03-05T07:38:35.807756+00:00",
+  "run_label": "final_v2_repeat",
+  "config": {
+    "local_api_base_url": "http://localhost:8000",
+    "query_limit": 5,
+    "language": "en",
+    "time_range": "",
+    "safesearch": 1,
+    "max_extract_chars": 6000,
+    "timeout_seconds": 30.0,
+    "query_count": 5
+  },
+  "queries": [
+    "python context manager tutorial",
+    "python asyncio taskgroup tutorial",
+    "oauth 2.0 authorization code flow",
+    "numpy array reshape tutorial",
+    "python logging best practices"
+  ],
+  "per_query": [
+    {
+      "query": "python context manager tutorial",
+      "search": {
+        "local_urls": [
+          "https://www.datacamp.com/tutorial/writing-custom-context-managers-in-python",
+          "https://www.pythonmorsels.com/creating-a-context-manager/",
+          "https://www.geeksforgeeks.org/python/context-manager-in-python/",
+          "https://docs.python.org/3/library/contextlib.html",
+          "https://realpython.com/python-with-statement/"
+        ],
+        "tavily_urls": [
+          "https://mimo.org/glossary/python/context-manager",
+          "https://www.analyticsvidhya.com/blog/2023/01/a-beginners-guide-to-context-manager/",
+          "https://www.datacamp.com/tutorial/writing-custom-context-managers-in-python",
+          "https://www.pythonmorsels.com/creating-a-context-manager/",
+          "https://book.pythontips.com/en/latest/context_managers.html"
+        ],
+        "intersection_count": 2,
+        "union_count": 8,
+        "jaccard": 0.25
+      },
+      "extract": {
+        "selected_url": "https://www.datacamp.com/tutorial/writing-custom-context-managers-in-python",
+        "selection_reason": "intersection_top_local",
+        "local_chars": 1777,
+        "tavily_chars": 21008,
+        "token_jaccard": 0.963,
+        "sequence_ratio": 0.14,
+        "local_noise_ratio": 0.0,
+        "tavily_noise_ratio": 0.0,
+        "noise_ratio_delta": 0.0,
+        "local_preview": "Skip to main content\nWriting Custom Context Managers in Python\nLearn the advanced aspects of resource management in Python by mastering how to write custom context managers.\nApr 12, 2024\nAuthor\nBex Tuychiev\nTopics\nPython\nContinue Your Python Journey Today!\nTrack\nPython Programmin",
+        "tavily_preview": "# Writing Custom Context Managers in Python\n\nLearn the advanced aspects of resource management in Python by mastering how to write custom context managers.\n\nApr 12, 2024\n\n## Motivation\n\nYou might already be familiar with the `with` statement, a concise way to handle resources in "
+      }
+    },
+    {
+      "query": "python asyncio taskgroup tutorial",
+      "search": {
+        "local_urls": [
+          "https://www.slingacademy.com/article/python-using-asyncio-taskgroup-to-manage-a-group-of-tasks-python-3-11/",
+          "https://sglmr.com/blog/python-asyncio-taskgroup-by-example/",
+          "https://superfastpython.com/asyncio-taskgroup/",
+          "https://bruceeckel.substack.com/p/python-311-asynciotaskgroup",
+          "https://www.reddit.com/r/Python/comments/stvoff/asynciotaskgroup_and_exceptiongroup_to_be_added/"
+        ],
+        "tavily_urls": [
+          "https://superfastpython.com/asyncio-taskgroup/",
+          "https://dev.to/koladev/creating-and-managing-tasks-with-asyncio-4kjl",
+          "https://bruceeckel.substack.com/p/python-311-asynciotaskgroup",
+          "https://sglmr.com/blog/python-asyncio-taskgroup-by-example/",
+          "https://www.geeksforgeeks.org/python/python-taskgroups-with-asyncio/"
+        ],
+        "intersection_count": 3,
+        "union_count": 7,
+        "jaccard": 0.429
+      },
+      "extract": {
+        "selected_url": "https://sglmr.com/blog/python-asyncio-taskgroup-by-example/",
+        "selection_reason": "intersection_top_local",
+        "local_chars": 6000,
+        "tavily_chars": 6704,
+        "token_jaccard": 0.906,
+        "sequence_ratio": 0.484,
+        "local_noise_ratio": 0.0,
+        "tavily_noise_ratio": 0.0,
+        "noise_ratio_delta": 0.0,
+        "local_preview": "Stephen Gilmore\nPython asyncio TaskGroup by example\nJune 3, 2025\n#Python#Async\nPython async is really helpful for anything waiting on I/O. Things like making API calls where most of the time is spent waiting for data to transfer to and from somewhere. For example, one project I w",
+        "tavily_preview": "Stephen Gilmore\n\n\n\n# Python asyncio TaskGroup by example\n\n[#Python](/blog/tag/python/)   [#Async](/blog/tag/async/)\n\nPython async is really helpful for anything waiting on I/O. Things like making API calls where most of the time is spent waiting for data to transfer to and from s"
+      }
+    },
+    {
+      "query": "oauth 2.0 authorization code flow",
+      "search": {
+        "local_urls": [
+          "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
+          "https://docs.secureauth.com/ciam/en/oauth-2-0-authorization-code-flow.html",
+          "https://www.workflows.guru/blogs/oauth2-flows-explained",
+          "https://datatracker.ietf.org/doc/html/rfc6749",
+          "https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow"
+        ],
+        "tavily_urls": [
+          "https://docs.secureauth.com/ciam/en/oauth-2-0-authorization-code-flow.html",
+          "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
+          "https://www.reform.app/blog/oauth-2-0-authorization-code-flow-explained",
+          "https://curity.io/resources/learn/oauth-code-flow/",
+          "https://auth0.com/docs/get-started/authentication-and-authorization-flow/authorization-code-flow"
+        ],
+        "intersection_count": 3,
+        "union_count": 7,
+        "jaccard": 0.429
+      },
+      "extract": {
+        "selected_url": "https://docs.secureauth.com/ciam/en/oauth-2-0-authorization-code-flow.html",
+        "selection_reason": "intersection_top_local",
+        "local_chars": 2059,
+        "tavily_chars": 3503,
+        "token_jaccard": 1.0,
+        "sequence_ratio": 0.7,
+        "local_noise_ratio": 0.0,
+        "tavily_noise_ratio": 0.0,
+        "noise_ratio_delta": 0.0,
+        "local_preview": "OAuth 2.0 authorization code flow\nThe authorization code flow is a secure method in OAuth 2.0. It issues a temporary authorization code to a client application. The client uses this code to get tokens:\nAccess token\nRefresh token\nID token\nThis flow suits confidential clients, such",
+        "tavily_preview": "* [Docs Home](https://docs.secureauth.com/home/index.html)\n* [SecureAuth.com](https://www.secureauth.com)\n* [Community](https://secureauth.vanillacommunities.com/)\n* [Support](https://www.secureauth.com/support/)\n\n*print*\n\n* [Prev](oauth---oidc-overview.html#pick-the-right-flow-f"
+      }
+    },
+    {
+      "query": "numpy array reshape tutorial",
+      "search": {
+        "local_urls": [
+          "https://realpython.com/numpy-reshape/",
+          "https://www.geeksforgeeks.org/python/reshape-numpy-array/",
+          "https://www.datacamp.com/doc/numpy/reshape",
+          "https://www.linkedin.com/learning/python-functions-for-data-science-28584261/reshape-numpy-arrays",
+          "https://www.w3schools.com/python/numpy/numpy_array_reshape.asp"
+        ],
+        "tavily_urls": [
+          "https://realpython.com/numpy-reshape/",
+          "https://techvidvan.com/tutorials/numpy-array-reshaping/",
+          "https://www.programiz.com/python-programming/numpy/array-reshaping",
+          "https://numpy.org/devdocs/reference/generated/numpy.reshape.html",
+          "https://www.geeksforgeeks.org/python/reshape-numpy-array/"
+        ],
+        "intersection_count": 2,
+        "union_count": 8,
+        "jaccard": 0.25
+      },
+      "extract": {
+        "selected_url": "https://www.geeksforgeeks.org/python/reshape-numpy-array/",
+        "selection_reason": "intersection_top_local",
+        "local_chars": 1564,
+        "tavily_chars": 7657,
+        "token_jaccard": 0.991,
+        "sequence_ratio": 0.324,
+        "local_noise_ratio": 0.0,
+        "tavily_noise_ratio": 0.0,
+        "noise_ratio_delta": 0.0,
+        "local_preview": "Reshaping in NumPy refers to modifying the dimensions of an existing array without changing its data. The reshape() function is used for this purpose. It reorganizes the elements into a new shape, which is useful in machine learning, matrix operations and data preparation.\nExampl",
+        "tavily_preview": "[![geeksforgeeks](https://media.geeksforgeeks.org/gfg-gg-logo.svg)](https://www.geeksforgeeks.org/)\n\n* Interview Prep\n\n* [Python Tutorial](https://www.geeksforgeeks.org/python/python-programming-language-tutorial/)\n* [Data Types](https://www.geeksforgeeks.org/python/python-data-t"
+      }
+    },
+    {
+      "query": "python logging best practices",
+      "search": {
+        "local_urls": [
+          "https://coralogix.com/blog/python-logging-best-practices-tips/",
+          "https://middleware.io/blog/python-logging-best-practices/",
+          "https://www.apriorit.com/dev-blog/cybersecurity-logging-python",
+          "https://stackoverflow.com/questions/22807972/python-best-practice-in-terms-of-logging",
+          "https://medium.com/@aliakbarhosseinzadeh/from-print-to-production-best-practices-for-python-logging-c4e8de2fa665"
+        ],
+        "tavily_urls": [
+          "https://coralogix.com/blog/python-logging-best-practices-tips/",
+          "https://uptimerobot.com/knowledge-hub/logging/python-logging-explained/",
+          "https://stackoverflow.com/questions/22807972/python-best-practice-in-terms-of-logging",
+          "https://realpython.com/ref/best-practices/logging/",
+          "https://realpython.com/python-logging/"
+        ],
+        "intersection_count": 2,
+        "union_count": 8,
+        "jaccard": 0.25
+      },
+      "extract": {
+        "selected_url": "https://stackoverflow.com/questions/22807972/python-best-practice-in-terms-of-logging",
+        "selection_reason": "intersection_top_local",
+        "local_chars": 4167,
+        "tavily_chars": 6097,
+        "token_jaccard": 0.628,
+        "sequence_ratio": 0.325,
+        "local_noise_ratio": 0.017,
+        "tavily_noise_ratio": 0.058,
+        "noise_ratio_delta": 0.041,
+        "local_preview": "Skip to main content\nAsked11 years, 11 months ago\nModified2 years, 10 months ago\nViewed 42k times\nWhen using the logging module from python for logging purposes. Is it best-practice to define a logger for each class?\nConsidering some things would be redundant such as file log loc",
+        "tavily_preview": "### [current community](https://stackoverflow.com)\n\n### your communities\n\n### [more stack exchange communities](https://stackexchange.com/sites)\n\nCommunities for your favorite technologies. [Explore all Collectives](/collectives-all)\n\nStack Overflow for Teams is now called **Stac"
+      }
+    }
+  ],
+  "summary": {
+    "query_count": 5,
+    "search_jaccard_avg": 0.322,
+    "extract_token_jaccard_avg": 0.898,
+    "extract_sequence_ratio_avg": 0.395,
+    "local_noise_ratio_avg": 0.003,
+    "tavily_noise_ratio_avg": 0.012,
+    "noise_ratio_improvement_vs_tavily_pct": 75.0,
+    "noise_ratio_improvement_vs_baseline_pct": 0.0
+  }
+}

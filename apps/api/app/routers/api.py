@@ -110,6 +110,9 @@ async def search(payload: SearchRequestBody) -> SearchResponseBody:
         mode=payload.mode,
         limit=payload.limit,
         page=payload.page,
+        language=payload.language,
+        time_range=payload.time_range,
+        safesearch=payload.safesearch,
         extract_top_n=payload.extract_top_n,
     )
     try:
@@ -119,6 +122,9 @@ async def search(payload: SearchRequestBody) -> SearchResponseBody:
             page=payload.page,
             categories=tuple(payload.categories),
             engines=tuple(payload.engines),
+            language=payload.language,
+            time_range=payload.time_range,
+            safesearch=payload.safesearch,
         )
         result_payload, cached = await runtime.search_service.search(
             request,
@@ -155,6 +161,9 @@ async def search(payload: SearchRequestBody) -> SearchResponseBody:
         mode=str(result_payload.get("mode", payload.mode)),
         limit=int(result_payload.get("limit", request.limit)),
         page=int(result_payload.get("page", request.page)),
+        language=str(result_payload.get("language", request.language)),
+        time_range=str(result_payload.get("time_range", request.time_range)),
+        safesearch=int(result_payload.get("safesearch", request.safesearch)),
         results=[SearchResultBody(**item) for item in result_payload.get("results", [])],
         cached=cached,
     )

@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from dataclasses import dataclass
@@ -7,6 +8,7 @@ from .core.domain_policy import DomainPolicyStore
 from .core.observability import InMemoryMetrics
 from .extract import DomainTokenBucketLimiter, ExtractService, RedisExtractCache
 from .providers import SearxngProvider
+from .search.rerank import DeterministicReranker, RerankConfig
 from .search import RedisSearchCache, SearchService
 
 
@@ -42,6 +44,29 @@ def _read_int_env(name: str, *, default: int) -> int:
         return default
 
 
+def _read_json_dict_env(name: str) -> dict[str, float] | None:
+    raw = os.getenv(name)
+    if not raw:
+        return None
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(data, dict):
+        return None
+
+    parsed: dict[str, float] = {}
+    for key, value in data.items():
+        domain = str(key).strip().lower()
+        if not domain:
+            continue
+        try:
+            parsed[domain] = float(value)
+        except (TypeError, ValueError):
+            continue
+    return parsed or None
+
+
 @dataclass(frozen=True, slots=True)
 class AppRuntime:
     logger: logging.Logger
@@ -72,6 +97,18 @@ def build_runtime() -> AppRuntime:
         else None
     )
     domain_policy_store = DomainPolicyStore.from_file(os.getenv("DOMAIN_POLICY_FILE"))
+    rerank_domain_priors = _read_json_dict_env("SEARCH_RERANK_DOMAIN_PRIORS_JSON")
+    rerank_kwargs: dict[str, object] = {
+        "title_weight": _read_float_env("SEARCH_RERANK_TITLE_WEIGHT", default=1.5),
+        "snippet_weight": _read_float_env("SEARCH_RERANK_SNIPPET_WEIGHT", default=0.8),
+        "domain_weight": _read_float_env("SEARCH_RERANK_DOMAIN_WEIGHT", default=0.5),
+        "path_weight": _read_float_env("SEARCH_RERANK_PATH_WEIGHT", default=0.35),
+        "diversity_weight": _read_float_env("SEARCH_RERANK_DIVERSITY_WEIGHT", default=0.35),
+        "source_score_weight": _read_float_env("SEARCH_RERANK_SOURCE_SCORE_WEIGHT", default=0.05),
+    }
+    if rerank_domain_priors:
+        rerank_kwargs["domain_priors"] = rerank_domain_priors
+    rerank_config = RerankConfig(**rerank_kwargs)
 
     searxng_provider = SearxngProvider(
         base_url=os.getenv("SEARXNG_BASE_URL", "http://searxng:8080"),
@@ -92,6 +129,7 @@ def build_runtime() -> AppRuntime:
             redis_url=os.getenv("REDIS_URL"),
             ttl_seconds=int(os.getenv("SEARCH_CACHE_TTL_SECONDS", "120")),
         ),
+        reranker=DeterministicReranker(rerank_config),
     )
     return AppRuntime(
         logger=logging.getLogger("openagentsearch.api"),

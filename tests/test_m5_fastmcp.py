@@ -39,6 +39,9 @@ class FastMCPPayloadTests(unittest.TestCase):
             mode="Balanced",
             limit=5,
             page=2,
+            language="EN",
+            time_range="MONTH",
+            safesearch=2,
             extract_top_n=2,
             max_extract_chars=5000,
         )
@@ -46,10 +49,19 @@ class FastMCPPayloadTests(unittest.TestCase):
         self.assertEqual(payload["mode"], "balanced")
         self.assertEqual(payload["limit"], 5)
         self.assertEqual(payload["page"], 2)
+        self.assertEqual(payload["language"], "en")
+        self.assertEqual(payload["time_range"], "month")
+        self.assertEqual(payload["safesearch"], 2)
 
     def test_build_search_payload_rejects_invalid_mode(self) -> None:
         with self.assertRaises(ValueError):
             build_search_payload(query="agent", mode="fast")
+
+    def test_build_search_payload_rejects_invalid_controls(self) -> None:
+        with self.assertRaises(ValueError):
+            build_search_payload(query="agent", time_range="week")
+        with self.assertRaises(ValueError):
+            build_search_payload(query="agent", safesearch=3)
 
     def test_build_extract_payload_validates(self) -> None:
         payload = build_extract_payload(url=" https://example.com ", max_chars=1200)

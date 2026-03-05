@@ -30,6 +30,9 @@ def create_mcp():
         mode: str = "speed",
         limit: int = 10,
         page: int = 1,
+        language: str = "all",
+        time_range: str = "",
+        safesearch: int = 1,
         extract_top_n: int = 3,
         max_extract_chars: int = 6000,
         auth_header_name: str | None = None,
@@ -40,6 +43,9 @@ def create_mcp():
             mode=mode,
             limit=limit,
             page=page,
+            language=language,
+            time_range=time_range,
+            safesearch=safesearch,
             extract_top_n=extract_top_n,
             max_extract_chars=max_extract_chars,
         )
@@ -75,6 +81,9 @@ def build_search_payload(
     mode: str = "speed",
     limit: int = 10,
     page: int = 1,
+    language: str = "all",
+    time_range: str = "",
+    safesearch: int = 1,
     extract_top_n: int = 3,
     max_extract_chars: int = 6000,
 ) -> dict[str, Any]:
@@ -88,6 +97,14 @@ def build_search_payload(
         raise ValueError("limit must be between 1 and 50")
     if page < 1:
         raise ValueError("page must be >= 1")
+    language_value = language.strip().lower() if language else "all"
+    if language_value != "all" and not _is_language_code(language_value):
+        raise ValueError("language must be 'all' or language code like 'en'/'ko-kr'")
+    time_range_value = time_range.strip().lower()
+    if time_range_value not in {"", "day", "month", "year"}:
+        raise ValueError("time_range must be one of: '', 'day', 'month', 'year'")
+    if safesearch not in {0, 1, 2}:
+        raise ValueError("safesearch must be one of: 0, 1, 2")
     if not 0 <= extract_top_n <= 20:
         raise ValueError("extract_top_n must be between 0 and 20")
     if not 1 <= max_extract_chars <= 200_000:
@@ -97,6 +114,9 @@ def build_search_payload(
         "mode": mode_value,
         "limit": limit,
         "page": page,
+        "language": language_value,
+        "time_range": time_range_value,
+        "safesearch": safesearch,
         "extract_top_n": extract_top_n,
         "max_extract_chars": max_extract_chars,
     }
@@ -109,3 +129,11 @@ def build_extract_payload(*, url: str, max_chars: int = 20_000) -> dict[str, Any
     if not 1 <= max_chars <= 200_000:
         raise ValueError("max_chars must be between 1 and 200000")
     return {"url": url_value, "max_chars": max_chars}
+
+
+def _is_language_code(value: str) -> bool:
+    if len(value) == 2 and value.isalpha():
+        return True
+    if len(value) == 5 and value[2] == "-" and value[:2].isalpha() and value[3:].isalpha():
+        return True
+    return False

@@ -6,6 +6,11 @@ Exposed tools:
 - `openagentsearch.search`
 - `openagentsearch.extract`
 
+`openagentsearch.search` supports search controls:
+- `language` (`all`, `en`, `ko-kr`, ...)
+- `time_range` (`day`, `month`, `year`)
+- `safesearch` (`0`, `1`, `2`)
+
 Runtime:
 ```bash
 uv run --project apps/mcp python -m app.main

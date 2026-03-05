@@ -12,6 +12,55 @@ class ExtractedDocument:
     content_hash: str | None
 
 
+NOISE_LINE_PATTERNS = (
+    re.compile(r"\bcookie\b", re.IGNORECASE),
+    re.compile(r"\bprivacy\b", re.IGNORECASE),
+    re.compile(r"\bterms\b", re.IGNORECASE),
+    re.compile(r"\bsubscribe\b", re.IGNORECASE),
+    re.compile(r"\bnewsletter\b", re.IGNORECASE),
+    re.compile(r"\bsign[\s-]?in\b", re.IGNORECASE),
+    re.compile(r"\blog[\s-]?in\b", re.IGNORECASE),
+    re.compile(r"\badvert", re.IGNORECASE),
+    re.compile(r"\bsponsored\b", re.IGNORECASE),
+    re.compile(r"\baccept all\b", re.IGNORECASE),
+    re.compile(r"\ball rights reserved\b", re.IGNORECASE),
+)
+
+NOISE_ATTR_PATTERNS = (
+    re.compile(r"cookie", re.IGNORECASE),
+    re.compile(r"banner", re.IGNORECASE),
+    re.compile(r"footer", re.IGNORECASE),
+    re.compile(r"sidebar", re.IGNORECASE),
+    re.compile(r"comment", re.IGNORECASE),
+    re.compile(r"social", re.IGNORECASE),
+    re.compile(r"share", re.IGNORECASE),
+    re.compile(r"menu", re.IGNORECASE),
+    re.compile(r"nav", re.IGNORECASE),
+    re.compile(r"ads?", re.IGNORECASE),
+    re.compile(r"newsletter", re.IGNORECASE),
+)
+
+IGNORE_TAGS = {
+    "script",
+    "style",
+    "noscript",
+    "svg",
+    "canvas",
+    "iframe",
+    "nav",
+    "footer",
+    "aside",
+    "form",
+    "button",
+    "input",
+    "select",
+    "option",
+    "textarea",
+}
+
+BLOCK_TAGS = {"p", "br", "section", "article", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6"}
+
+
 def extract_document(html_text: str, *, max_chars: int) -> ExtractedDocument:
     markdown, title = _extract_markdown(html_text)
     markdown = markdown.strip()
@@ -83,7 +132,9 @@ def _extract_markdown(html_text: str) -> tuple[str, str | None]:
     parser.feed(html_text)
     parser.close()
     title = parser.title.strip() if parser.title else None
-    return parser.text.strip(), title
+    raw_text = parser.text.strip()
+    cleaned = _cleanup_fallback_text(raw_text)
+    return cleaned, title
 
 
 def _try_trafilatura(html_text: str) -> tuple[str, str | None] | None:
@@ -114,7 +165,7 @@ def _try_readability(html_text: str) -> tuple[str, str | None] | None:
     parser = _PlainTextParser()
     parser.feed(doc.summary(html_partial=True))
     parser.close()
-    content = parser.text.strip()
+    content = _cleanup_fallback_text(parser.text.strip())
     if not content:
         return None
     title = doc.short_title() or None
@@ -146,25 +197,24 @@ class _PlainTextParser(HTMLParser):
         return html.unescape("".join(self._title_parts)).strip()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag in {"script", "style", "noscript"}:
-            self._ignore_depth += 1
-            return
         if tag == "title":
             self._capture_title = True
             return
         if self._ignore_depth > 0:
+            self._ignore_depth += 1
             return
-        if tag in {"p", "br", "section", "article", "div", "li", "h1", "h2", "h3", "h4"}:
+        if tag in IGNORE_TAGS or _has_noise_attrs(attrs):
+            self._ignore_depth = 1
+            return
+        if tag in BLOCK_TAGS:
             self._chunks.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
-        if tag in {"script", "style", "noscript"} and self._ignore_depth > 0:
-            self._ignore_depth -= 1
-            return
         if tag == "title":
             self._capture_title = False
             return
         if self._ignore_depth > 0:
+            self._ignore_depth -= 1
             return
         if tag in {"p", "section", "article", "div", "li"}:
             self._chunks.append("\n")
@@ -178,3 +228,58 @@ class _PlainTextParser(HTMLParser):
         normalized = re.sub(r"\s+", " ", data)
         if normalized.strip():
             self._chunks.append(normalized)
+
+
+def _has_noise_attrs(attrs: list[tuple[str, str | None]]) -> bool:
+    for key, value in attrs:
+        if key is None or value is None:
+            continue
+        key_lower = key.lower()
+        if key_lower not in {"id", "class", "role", "aria-label"}:
+            continue
+        for pattern in NOISE_ATTR_PATTERNS:
+            if pattern.search(value):
+                return True
+    return False
+
+
+def _cleanup_fallback_text(text: str) -> str:
+    candidate = text.strip()
+    if not candidate:
+        return ""
+
+    lines = [line.strip() for line in candidate.splitlines() if line.strip()]
+    filtered: list[str] = []
+    short_seen: set[str] = set()
+    for line in lines:
+        normalized_line = re.sub(r"\s+", " ", line).strip()
+        if not normalized_line:
+            continue
+        if _is_noise_line(normalized_line):
+            continue
+        if len(normalized_line) <= 60:
+            lowered = normalized_line.lower()
+            if lowered in short_seen:
+                continue
+            short_seen.add(lowered)
+        filtered.append(normalized_line)
+
+    if not filtered:
+        return candidate
+    cleaned = "\n".join(filtered).strip()
+
+    # Keep content-preserving fallback behavior if cleanup removes too much.
+    if len(cleaned) < max(180, int(len(candidate) * 0.55)):
+        return candidate
+    return cleaned
+
+
+def _is_noise_line(line: str) -> bool:
+    if len(line) <= 48 and line.count("|") >= 2:
+        return True
+    if len(line) <= 40 and line.count("·") >= 2:
+        return True
+    for pattern in NOISE_LINE_PATTERNS:
+        if pattern.search(line):
+            return True
+    return False

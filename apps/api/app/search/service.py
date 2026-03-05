@@ -22,6 +22,11 @@ class SearchCache(Protocol):
         ...
 
 
+class SearchReranker(Protocol):
+    def rerank(self, request: SearchRequest, results: list[SearchResult]) -> list[SearchResult]:
+        ...
+
+
 class SearchService:
     def __init__(
         self,
@@ -29,10 +34,12 @@ class SearchService:
         provider: SearchProvider,
         extract_service: ExtractorService | None,
         cache: SearchCache | None,
+        reranker: SearchReranker | None = None,
     ) -> None:
         self._provider = provider
         self._extract_service = extract_service
         self._cache = cache
+        self._reranker = reranker
 
     async def search(
         self,
@@ -61,7 +68,13 @@ class SearchService:
                 return cached, True
 
         base_results = await self._provider.search(request)
-        items = [self._serialize_result(result) for result in base_results]
+        ranked_results = (
+            self._reranker.rerank(request, base_results)
+            if self._reranker is not None
+            else list(base_results)
+        )
+        limited_results = ranked_results[: request.limit]
+        items = [self._serialize_result(result) for result in limited_results]
 
         if mode == "balanced" and extract_top_n > 0:
             if self._extract_service is None:
@@ -73,6 +86,9 @@ class SearchService:
             "mode": mode,
             "limit": request.limit,
             "page": request.page,
+            "language": request.language,
+            "time_range": request.time_range,
+            "safesearch": request.safesearch,
             "results": items,
         }
         if self._cache is not None:
@@ -132,6 +148,9 @@ def _build_cache_key(
         "page": request.page,
         "categories": list(request.categories),
         "engines": list(request.engines),
+        "language": request.language,
+        "time_range": request.time_range,
+        "safesearch": request.safesearch,
         "mode": mode,
         "extract_top_n": extract_top_n,
         "max_extract_chars": max_extract_chars,

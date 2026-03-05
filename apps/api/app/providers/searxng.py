@@ -60,7 +60,7 @@ class SearxngProvider:
             )
 
         deduped = dedupe_search_results(parsed_results)
-        return deduped[: request.limit]
+        return deduped
 
     @staticmethod
     def _build_params(request: SearchRequest) -> dict[str, str | int]:
@@ -68,7 +68,11 @@ class SearxngProvider:
             "q": request.query,
             "format": "json",
             "pageno": request.page,
+            "language": request.language,
+            "safesearch": request.safesearch,
         }
+        if request.time_range:
+            params["time_range"] = request.time_range
         if request.categories:
             params["categories"] = ",".join(request.categories)
         if request.engines:
