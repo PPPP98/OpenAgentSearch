@@ -7,6 +7,8 @@
 
 > OpenAgentSearch는 SearXNG 검색에 본문 추출, 안전 제어, MCP 도구를 결합합니다.
 
+![OpenAgentSearch 로고](assets/openagentsearch-logo.svg)
+
 ## 빠른 시작 (2분)
 
 ```bash

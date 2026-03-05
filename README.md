@@ -7,6 +7,8 @@ Korean documentation: [README.ko.md](README.ko.md)
 
 > OpenAgentSearch combines SearXNG search with extraction, safety controls, and MCP tools.
 
+![OpenAgentSearch logo](assets/openagentsearch-logo.svg)
+
 ## Quick Start (2 min)
 
 ```bash
