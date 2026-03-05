@@ -26,6 +26,7 @@ Then check:
 - [Key Advantages](#key-advantages)
 - [End-to-End Setup](#end-to-end-setup)
 - [Operations and Configuration](#operations-and-configuration)
+- [Quality Benchmark](#quality-benchmark)
 - [API Quick Reference](#api-quick-reference)
 - [MCP Quick Reference](#mcp-quick-reference)
 - [Project Layout](#project-layout)
@@ -51,6 +52,7 @@ This project uses `SearXNG` as a search provider, then adds the missing producti
 - Split API modes: `speed` (SERP only) and `balanced` (SERP + extraction)
 - Structured extraction output for downstream LLM pipelines
 - Redis caching for both query and extraction responses
+- Deterministic reranking (title/snippet/domain/path/diversity signals)
 - Security baseline: SSRF checks, domain policy, per-domain rate limiting
 - FastMCP thin-wrapper design for easy MCP integration
 - Simple deployment with Docker Compose
@@ -107,7 +109,10 @@ curl -X POST "http://localhost:8000/v1/search" \
   -d '{
     "query": "latest ai news",
     "mode": "speed",
-    "limit": 5
+    "limit": 5,
+    "language": "en",
+    "time_range": "month",
+    "safesearch": 1
   }'
 ```
 
@@ -196,17 +201,55 @@ Main API environment variables:
 | `EXTRACT_RATE_LIMIT_TOKENS_PER_SEC` | `1.0` | Token refill rate per second |
 | `EXTRACT_RATE_LIMIT_BURST` | `3` | Burst token size |
 | `OAS_DISABLE_RATE_LIMIT` | `false` | Force-disable rate limiting |
+| `SEARCH_RERANK_TITLE_WEIGHT` | `1.5` | Query-title overlap weight |
+| `SEARCH_RERANK_SNIPPET_WEIGHT` | `0.8` | Query-snippet overlap weight |
+| `SEARCH_RERANK_DOMAIN_WEIGHT` | `0.5` | Domain prior weight |
+| `SEARCH_RERANK_PATH_WEIGHT` | `0.35` | URL path quality weight |
+| `SEARCH_RERANK_DIVERSITY_WEIGHT` | `0.35` | Same-domain diversity penalty weight |
+| `SEARCH_RERANK_SOURCE_SCORE_WEIGHT` | `0.05` | Upstream score blending weight |
+| `SEARCH_RERANK_DOMAIN_PRIORS_JSON` | - | Domain prior overrides as JSON object |
 
 Sample policy file:
 
 - `infra/domain_policies.json`
 
+## Quality Benchmark
+
+Compare local search/extract quality against Tavily and save reproducible artifacts.
+
+1. Run baseline (from repository root):
+
+```bash
+cd apps/api
+uv run python -m app.benchmark.run_compare --mode baseline --run-label baseline_v2 --language en --limit 5 --safesearch 1
+```
+
+2. Run comparison after changes:
+
+```bash
+cd apps/api
+uv run python -m app.benchmark.run_compare --mode run --run-label final_v2_repeat --language en --limit 5 --safesearch 1
+```
+
+Artifacts are saved under:
+
+- `artifacts/search-compare/baseline.json`
+- `artifacts/search-compare/latest.json`
+- `artifacts/search-compare/runs/*.json`
+- `artifacts/search-compare/final_report.md`
+
+Full test suite:
+
+```bash
+uv run --project apps/api python -m unittest discover -s tests -v
+```
+
 ## API Quick Reference
 
 `POST /v1/search`
 
-- Input: `query`, `mode`, `limit`, `page`, `categories`, `engines`, `extract_top_n`, `max_extract_chars`
-- Output: `query`, `mode`, `limit`, `page`, `results[]`, `cached`
+- Input: `query`, `mode`, `limit`, `page`, `categories`, `engines`, `language`, `time_range`, `safesearch`, `extract_top_n`, `max_extract_chars`
+- Output: `query`, `mode`, `limit`, `page`, `language`, `time_range`, `safesearch`, `results[]`, `cached`
 - `results[].extract` can be included in `balanced` mode
 
 `POST /v1/extract`
@@ -230,7 +273,7 @@ Tools:
 
 `openagentsearch.search` main args:
 
-- `query`, `mode`, `limit`, `page`, `extract_top_n`, `max_extract_chars`
+- `query`, `mode`, `limit`, `page`, `language`, `time_range`, `safesearch`, `extract_top_n`, `max_extract_chars`
 
 `openagentsearch.extract` main args:
 
@@ -247,5 +290,5 @@ Per-call auth header override:
 - `apps/mcp`: FastMCP service
 - `infra`: infrastructure and policy files
 - `tests`: unit and integration tests
-- `plan/PLAN_v1.md`: milestone and progress notes
-
+- `artifacts/search-compare`: benchmark inputs/results/reports
+- `plan/PLAN_v2_search_quality_upgrade.md`: quality upgrade milestone checklist

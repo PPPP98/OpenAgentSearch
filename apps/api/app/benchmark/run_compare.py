@@ -16,7 +16,8 @@ from .compare import (
     write_fixed_query_batch,
 )
 
-DEFAULT_OUT_DIR = Path("artifacts/search-compare")
+REPO_ROOT = Path(__file__).resolve().parents[4]
+DEFAULT_OUT_DIR = REPO_ROOT / "artifacts" / "search-compare"
 
 
 def parse_args() -> argparse.Namespace:
