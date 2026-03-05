@@ -14,7 +14,7 @@ def create_mcp():
         raise RuntimeError("fastmcp is required to run MCP server") from exc
 
     client = OpenAgentSearchApiClient(
-        base_url=os.getenv("OAS_API_BASE_URL", "http://api:8000"),
+        base_url=os.getenv("OAS_API_BASE_URL", "http://localhost:8000"),
         timeout_seconds=float(os.getenv("OAS_API_TIMEOUT_SECONDS", "20")),
         auth_header_name=os.getenv("OAS_AUTH_HEADER_NAME"),
         auth_header_value=os.getenv("OAS_AUTH_HEADER_VALUE"),
@@ -30,6 +30,8 @@ def create_mcp():
         mode: str = "speed",
         limit: int = 10,
         page: int = 1,
+        categories: list[str] | None = None,
+        engines: list[str] | None = None,
         language: str = "all",
         time_range: str = "",
         safesearch: int = 1,
@@ -43,6 +45,8 @@ def create_mcp():
             mode=mode,
             limit=limit,
             page=page,
+            categories=categories,
+            engines=engines,
             language=language,
             time_range=time_range,
             safesearch=safesearch,
@@ -81,6 +85,8 @@ def build_search_payload(
     mode: str = "speed",
     limit: int = 10,
     page: int = 1,
+    categories: list[str] | None = None,
+    engines: list[str] | None = None,
     language: str = "all",
     time_range: str = "",
     safesearch: int = 1,
@@ -97,6 +103,8 @@ def build_search_payload(
         raise ValueError("limit must be between 1 and 50")
     if page < 1:
         raise ValueError("page must be >= 1")
+    categories_value = _normalize_text_list("categories", categories)
+    engines_value = _normalize_text_list("engines", engines)
     language_value = language.strip().lower() if language else "all"
     if language_value != "all" and not _is_language_code(language_value):
         raise ValueError("language must be 'all' or language code like 'en'/'ko-kr'")
@@ -114,6 +122,8 @@ def build_search_payload(
         "mode": mode_value,
         "limit": limit,
         "page": page,
+        "categories": categories_value,
+        "engines": engines_value,
         "language": language_value,
         "time_range": time_range_value,
         "safesearch": safesearch,
@@ -137,3 +147,24 @@ def _is_language_code(value: str) -> bool:
     if len(value) == 5 and value[2] == "-" and value[:2].isalpha() and value[3:].isalpha():
         return True
     return False
+
+
+def _normalize_text_list(field_name: str, values: list[str] | None) -> list[str]:
+    if values is None:
+        return []
+    if not isinstance(values, list):
+        raise ValueError(f"{field_name} must be list[str]")
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for item in values:
+        if not isinstance(item, str):
+            raise ValueError(f"{field_name} must be list[str]")
+        text = item.strip()
+        if not text:
+            continue
+        if text in seen:
+            continue
+        seen.add(text)
+        normalized.append(text)
+    return normalized

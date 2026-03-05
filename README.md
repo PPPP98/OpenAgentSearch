@@ -241,7 +241,7 @@ Tools:
 
 `openagentsearch.search` main args:
 
-- `query`, `mode`, `limit`, `page`, `language`, `time_range`, `safesearch`, `extract_top_n`, `max_extract_chars`
+- `query`, `mode`, `limit`, `page`, `categories`, `engines`, `language`, `time_range`, `safesearch`, `extract_top_n`, `max_extract_chars`
 
 `openagentsearch.extract` main args:
 

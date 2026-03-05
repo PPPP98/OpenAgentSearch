@@ -241,7 +241,7 @@ uv run --project apps/mcp python -m app.main
 
 `openagentsearch.search` 주요 인자:
 
-- `query`, `mode`, `limit`, `page`, `language`, `time_range`, `safesearch`, `extract_top_n`, `max_extract_chars`
+- `query`, `mode`, `limit`, `page`, `categories`, `engines`, `language`, `time_range`, `safesearch`, `extract_top_n`, `max_extract_chars`
 
 `openagentsearch.extract` 주요 인자:
 
