@@ -142,34 +142,62 @@ curl -X POST "http://localhost:8000/v1/extract" \
 - 불필요한 방화벽 포트 차단
 - SearXNG는 내부 네트워크에서만 접근
 
-### F. MCP 연결
+### F. MCP 연결 (실전 가이드)
 
-1. MCP 서버 실행:
+여기서 많이 막힙니다. `apps/mcp`는 별도 Python 의존성을 사용하므로, MCP 클라이언트 연결 전에 해당 폴더 기준으로 의존성 동기화를 먼저 해야 합니다.
+
+1. API를 먼저 실행(필수):
+
+```bash
+docker compose up -d --build
+```
+
+2. `apps/mcp` 의존성 설치/동기화:
+
+```bash
+uv sync --project apps/mcp --frozen --no-dev
+```
+
+환경에 따라 lock 기반 설치가 실패하면 아래를 사용:
+
+```bash
+uv sync --project apps/mcp
+```
+
+3. MCP 서버 단독 실행 테스트:
 
 ```bash
 uv run --project apps/mcp python -m app.main
 ```
 
-2. 환경 변수:
+에러 없이 실행되면 `Ctrl+C`로 종료합니다.
 
-- `OAS_API_BASE_URL`
-- `OAS_API_TIMEOUT_SECONDS`
-- `OAS_AUTH_HEADER_NAME` (선택)
-- `OAS_AUTH_HEADER_VALUE` (선택)
+4. 실행 위치에 맞게 `OAS_API_BASE_URL` 설정:
 
-3. MCP 클라이언트 실행 위치에 맞춰 `OAS_API_BASE_URL` 설정:
+- MCP 클라이언트를 호스트 OS에서 실행: `http://localhost:8000`
+- MCP 클라이언트를 같은 Docker 네트워크에서 실행: `http://api:8000`
 
-- 호스트 OS에서 실행: `http://localhost:8000`
-- 동일 Docker 네트워크에서 실행: `http://api:8000`
+5. MCP 클라이언트 설정 파일(`mcp.json` 또는 동등한 설정)에 서버 등록:
 
-4. MCP 설정 예시:
+중요 경로 규칙:
+- `--project`에는 절대경로를 쓰는 것을 권장합니다. (클라이언트의 현재 작업 디렉터리 영향 제거)
+- Windows는 `\\` 이스케이프 또는 `/` 경로를 사용할 수 있습니다.
+
+Windows 예시 (`C:/path/to/OpenAgentSearch`):
 
 ```json
 {
   "mcpServers": {
     "openagentsearch": {
       "command": "uv",
-      "args": ["run", "--project", "apps/mcp", "python", "-m", "app.main"],
+      "args": [
+        "run",
+        "--project",
+        "C:/path/to/OpenAgentSearch/apps/mcp",
+        "python",
+        "-m",
+        "app.main"
+      ],
       "env": {
         "OAS_API_BASE_URL": "http://localhost:8000",
         "OAS_API_TIMEOUT_SECONDS": "20"
@@ -179,10 +207,41 @@ uv run --project apps/mcp python -m app.main
 }
 ```
 
-5. 아래 도구가 보이는지 확인:
+macOS/Linux 예시:
+
+```json
+{
+  "mcpServers": {
+    "openagentsearch": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        "/absolute/path/to/OpenAgentSearch/apps/mcp",
+        "python",
+        "-m",
+        "app.main"
+      ],
+      "env": {
+        "OAS_API_BASE_URL": "http://localhost:8000",
+        "OAS_API_TIMEOUT_SECONDS": "20"
+      }
+    }
+  }
+}
+```
+
+6. MCP 클라이언트를 완전히 재시작한 뒤 도구 노출 확인:
 
 - `openagentsearch.search`
 - `openagentsearch.extract`
+
+7. 자주 발생하는 문제:
+
+- `uv` 명령을 찾을 수 없음: `uv` 설치 및 `PATH` 반영 확인
+- `No module named fastmcp`/`httpx`: `uv sync --project apps/mcp` 재실행
+- API 연결 실패(타임아웃/거부): `http://localhost:8000/health` 확인
+- 도구가 안 뜸: `mcp.json` 문법/경로 확인 후 클라이언트 재시작
 
 ## 운영 및 설정
 

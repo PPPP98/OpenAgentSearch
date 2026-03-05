@@ -142,34 +142,62 @@ Recommended production setup:
 - Restrict unnecessary firewall ports
 - Keep SearXNG internal to private network
 
-### F. Connect MCP
+### F. Connect MCP (Step-by-Step)
 
-1. Run MCP server:
+This is the part many users miss. `apps/mcp` has its own Python dependencies, so you must sync that environment before connecting from your MCP client.
+
+1. Start API first (required):
+
+```bash
+docker compose up -d --build
+```
+
+2. Install/sync MCP dependencies in `apps/mcp`:
+
+```bash
+uv sync --project apps/mcp --frozen --no-dev
+```
+
+If lock-based install fails in your environment, use:
+
+```bash
+uv sync --project apps/mcp
+```
+
+3. Smoke test MCP server locally:
 
 ```bash
 uv run --project apps/mcp python -m app.main
 ```
 
-2. Environment variables:
+If it starts without import/runtime errors, stop with `Ctrl+C`.
 
-- `OAS_API_BASE_URL`
-- `OAS_API_TIMEOUT_SECONDS`
-- `OAS_AUTH_HEADER_NAME` (optional)
-- `OAS_AUTH_HEADER_VALUE` (optional)
+4. Set `OAS_API_BASE_URL` correctly for your runtime:
 
-3. Set `OAS_API_BASE_URL` based on where the MCP client runs:
+- MCP client on host OS: `http://localhost:8000`
+- MCP client inside same Docker network: `http://api:8000`
 
-- client on host OS: `http://localhost:8000`
-- client in same Docker network: `http://api:8000`
+5. Configure your MCP client (`mcp.json` or equivalent).
 
-4. Example MCP config:
+Important path rule:
+- Use an absolute `--project` path so it works regardless of where the client process starts.
+- On Windows, use either escaped backslashes (`\\`) or forward slashes (`/`).
+
+Windows example (`C:/path/to/OpenAgentSearch`):
 
 ```json
 {
   "mcpServers": {
     "openagentsearch": {
       "command": "uv",
-      "args": ["run", "--project", "apps/mcp", "python", "-m", "app.main"],
+      "args": [
+        "run",
+        "--project",
+        "C:/path/to/OpenAgentSearch/apps/mcp",
+        "python",
+        "-m",
+        "app.main"
+      ],
       "env": {
         "OAS_API_BASE_URL": "http://localhost:8000",
         "OAS_API_TIMEOUT_SECONDS": "20"
@@ -179,10 +207,41 @@ uv run --project apps/mcp python -m app.main
 }
 ```
 
-5. Confirm the following tools are visible:
+macOS/Linux example:
+
+```json
+{
+  "mcpServers": {
+    "openagentsearch": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        "/absolute/path/to/OpenAgentSearch/apps/mcp",
+        "python",
+        "-m",
+        "app.main"
+      ],
+      "env": {
+        "OAS_API_BASE_URL": "http://localhost:8000",
+        "OAS_API_TIMEOUT_SECONDS": "20"
+      }
+    }
+  }
+}
+```
+
+6. Restart MCP client app completely, then confirm tools:
 
 - `openagentsearch.search`
 - `openagentsearch.extract`
+
+7. Quick troubleshooting:
+
+- `uv: command not found`: install `uv` and ensure it is in `PATH`.
+- `No module named fastmcp` or `httpx`: run `uv sync --project apps/mcp`.
+- Connection refused/timeouts: verify API health at `http://localhost:8000/health`.
+- Tools do not appear after config edit: check JSON syntax and restart client app.
 
 ## Operations and Configuration
 
