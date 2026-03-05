@@ -26,7 +26,6 @@ Then check:
 - [Key Advantages](#key-advantages)
 - [End-to-End Setup](#end-to-end-setup)
 - [Operations and Configuration](#operations-and-configuration)
-- [Quality Benchmark](#quality-benchmark)
 - [API Quick Reference](#api-quick-reference)
 - [MCP Quick Reference](#mcp-quick-reference)
 - [Project Layout](#project-layout)
@@ -212,37 +211,6 @@ Main API environment variables:
 Sample policy file:
 
 - `infra/domain_policies.json`
-
-## Quality Benchmark
-
-Compare local search/extract quality against Tavily and save reproducible artifacts.
-
-1. Run baseline (from repository root):
-
-```bash
-cd apps/api
-uv run python -m app.benchmark.run_compare --mode baseline --run-label baseline_v2 --language en --limit 5 --safesearch 1
-```
-
-2. Run comparison after changes:
-
-```bash
-cd apps/api
-uv run python -m app.benchmark.run_compare --mode run --run-label final_v2_repeat --language en --limit 5 --safesearch 1
-```
-
-Artifacts are saved under:
-
-- `artifacts/search-compare/baseline.json`
-- `artifacts/search-compare/latest.json`
-- `artifacts/search-compare/runs/*.json`
-- `artifacts/search-compare/final_report.md`
-
-Full test suite:
-
-```bash
-uv run --project apps/api python -m unittest discover -s tests -v
-```
 
 ## API Quick Reference
 
