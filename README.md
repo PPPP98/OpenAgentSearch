@@ -3,6 +3,17 @@
 Self-hosted web search and extraction platform for agent workflows.
 This project was implemented with vibe coding.
 
+## TIP
+If you're using OpenClaw, try giving it the GitHub repository URL first and ask it to connect.
+You can copy and try this prompt as-is:
+
+```text
+Clone this GitHub repository, read the README, and set it up so I can use it:
+https://github.com/PPPP98/OpenAgentSearch
+```
+
+> OpenClaw handled the connection flow on its own when I tried it this way.
+
 Korean documentation: [README.ko.md](README.ko.md)
 
 > OpenAgentSearch combines SearXNG search with extraction, safety controls, and MCP tools.

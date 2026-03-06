@@ -3,6 +3,17 @@
 에이전트 워크플로우를 위한 자체 호스팅 웹 검색/추출 플랫폼입니다.
 본 프로젝트는 바이브 코딩으로 구현했습니다.
 
+## TIP
+OpenClaw를 쓰는 경우 먼저 GitHub 저장소 링크만 주고 연결해보라고 시켜보세요.
+아래 프롬프트를 그대로 복사해서 시도할 수 있습니다:
+
+```text
+이 GitHub 저장소를 clone해서 README를 읽고 사용할 수 있게 세팅해줘:
+https://github.com/PPPP98/OpenAgentSearch
+```
+
+> 이 방식으로 OpenClaw가 알아서 연결 절차를 진행했습니다.
+
 기본 영문 문서: [README.md](README.md)
 
 > OpenAgentSearch는 SearXNG 검색에 본문 추출, 안전 제어, MCP 도구를 결합합니다.
